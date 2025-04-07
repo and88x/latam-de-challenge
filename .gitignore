@@ -1,0 +1,43 @@
+# ----------------------------------
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Entornos virtuales
+.venv/
+env/
+venv/
+ENV/
+
+# IDEs y editores
+.vscode/
+.idea/
+
+# Logs y archivos temporales
+*.log
+*.tmp
+*.out
+*.mprof
+*.dat
+*.pstat
+
+# Archivos de datos locales
+data/
+*.csv
+*.json
+*.jsonl
+*.parquet
+*.zip
+*.gz
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de prueba temporal
+temp/
+tmp/
