@@ -45,7 +45,7 @@ def q3_memory(file_path: str) -> List[Tuple[str, int]]:
                 try:
                     tweet = cargar_json(linea)
 
-                    for usuarios_mencionados in tweet.get("mentionedUsers", []):
+                    for usuarios_mencionados in tweet.get("mentionedUsers") or []:
                         usuario = usuarios_mencionados.get("username")
                         if usuario:
                             yield usuario
