@@ -3,11 +3,11 @@ import heapq
 
 from typing import List, Tuple
 from collections import defaultdict
-from json import loads as cargar_json
+from json import loads as cargar_json, JSONDecodeError
 
 
 def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
-        """
+    """
     Procesa un archivo de tweets en formato JSON línea por línea, devolviendo las 10 fechas con más
     tweets, junto con el nombre de usuario (username) más activo para cada una de esas fechas.
 
@@ -61,7 +61,7 @@ def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
                 tweets_por_fecha[fecha] += 1
                 tweets_usuario_fecha[fecha][usuario] += 1
 
-            except json.JSONDecodeError:
+            except JSONDecodeError:
                 continue
 
     # Usar heap para mantener solo las 10 fechas con más tweets
