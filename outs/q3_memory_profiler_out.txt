@@ -1,0 +1,58 @@
+Accordion(children=(Output(),), titles=('',))
+Filename: C:\Users\and88\OneDrive\Documents\Python\latam_challenge_DE\src\q3_memory.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     6    491.5 MiB    491.5 MiB           1   def q3_memory(file_path: str) -> List[Tuple[str, int]]:
+     7                                             """
+     8                                             Procesa un archivo de tweets en formato JSON línea por línea, devolviendo los 10 usuarios
+     9                                             más influyentes, definidos como aquellos que más veces fueron mencionados (@username).
+    10                                         
+    11                                             Este método está optimizado para un bajo uso de memoria, ya que no carga el archivo completo
+    12                                             en memoria, sino que procesa cada tweet individualmente a través de un generador que produce
+    13                                             los usernames mencionados uno por uno. Luego utiliza un Counter para acumular las menciones.
+    14                                         
+    15                                             Args:
+    16                                                 file_path (str): Ruta al archivo de tweets en formato JSON (una línea por tweet).
+    17                                         
+    18                                             Returns:
+    19                                                 List[Tuple[str, int]]:
+    20                                                     Una lista ordenada (descendente) con los 10 usuarios más mencionados.
+    21                                                     Cada elemento es una tupla que contiene:
+    22                                                         - str: El username del usuario mencionado.
+    23                                                         - int: Cantidad total de veces que fue mencionado.
+    24                                         
+    25                                                     Ejemplo:
+    26                                                     [
+    27                                                         ("LATAM321", 387),
+    28                                                         ("LATAM_CHI", 129),
+    29                                                         ...
+    30                                                     ]
+    31                                         
+    32                                             Notas y supuestos:
+    33                                                 - Se asume que cada línea del archivo es un JSON válido con codificación UTF-8.
+    34                                                 - El campo 'mentionedUsers' puede ser nulo, omitido o una lista vacía.
+    35                                                 - Se ignoran los tweets mal formateados o sin menciones válidas.
+    36                                             """
+    37                                         
+    38    491.5 MiB      0.0 MiB           2       def generador_menciones():
+    39                                                 """
+    40                                                 Generador que produce los nombres de usuario mencionados (username)
+    41                                                 en el campo 'mentionedUsers' de cada tweet válido del archivo.
+    42                                                 """
+    43    492.3 MiB      0.0 MiB           2           with open(file_path, "r", encoding="utf-8") as file:
+    44    492.3 MiB      0.0 MiB      117408               for linea in file:
+    45    492.3 MiB      0.0 MiB      117407                   try:
+    46    492.3 MiB      0.8 MiB      117407                       tweet = cargar_json(linea)
+    47                                         
+    48    492.3 MiB      0.0 MiB      220810                       for usuarios_mencionados in tweet.get("mentionedUsers") or []:
+    49    492.3 MiB      0.0 MiB      103403                           usuario = usuarios_mencionados.get("username")
+    50    492.3 MiB      0.0 MiB      103403                           if usuario:
+    51    492.3 MiB      0.0 MiB      206806                               yield usuario
+    52                                         
+    53                                                         except JSONDecodeError:
+    54                                                             continue
+    55                                         
+    56    491.5 MiB      0.0 MiB           1       menciones = Counter()
+    57    492.3 MiB      0.0 MiB           1       menciones.update(generador_menciones())
+    58    492.3 MiB      0.0 MiB           1       return menciones.most_common(10)

@@ -1,0 +1,64 @@
+Accordion(children=(Output(),), titles=('',))
+Timer unit: 1e-07 s
+
+Total time: 2.53946 s
+File: C:\Users\and88\OneDrive\Documents\Python\latam_challenge_DE\src\q3_time.py
+Function: q3_time at line 8
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     8                                           def q3_time(file_path: str) -> List[Tuple[str, int]]:
+     9                                               """
+    10                                               Procesa un archivo de tweets en formato JSON línea por línea, devolviendo los 10 usuarios
+    11                                               más mencionados (en el campo 'mentionedUsers') a lo largo de todo el historial.
+    12                                           
+    13                                               Esta versión está optimizada para minimizar el tiempo de ejecución. En lugar de parsear
+    14                                               todas las líneas del archivo, utiliza una expresión regular para detectar solo aquellas
+    15                                               líneas que contienen al menos un usuario mencionado, reduciendo significativamente la
+    16                                               cantidad de operaciones costosas de json.loads().
+    17                                           
+    18                                               Args:
+    19                                                   file_path (str): Ruta al archivo de tweets en formato JSON (una línea por tweet).
+    20                                           
+    21                                               Returns:
+    22                                                   List[Tuple[str, int]]:
+    23                                                       Una lista ordenada (descendente) con los 10 usuarios más mencionados.
+    24                                                       Cada elemento es una tupla que contiene:
+    25                                                           - str: El username del usuario mencionado.
+    26                                                           - int: Cantidad total de veces que fue mencionado.
+    27                                           
+    28                                                       Ejemplo:
+    29                                                       [
+    30                                                           ("LATAM321", 387),
+    31                                                           ("LATAM_CHI", 129),
+    32                                                           ...
+    33                                                       ]
+    34                                           
+    35                                               Notas y supuestos:
+    36                                                   - Se asume que cada línea del archivo representa un JSON válido con codificación UTF-8.
+    37                                                   - Solo se procesan las líneas que contienen una lista con al menos un objeto dentro del
+    38                                                     campo 'mentionedUsers'.
+    39                                                   - Las líneas sin menciones o con arrays vacíos se descartan automáticamente antes de parsear
+    40                                                     el JSON.
+    41                                                   - Tweets mal formateados son ignorados.
+    42                                               """
+    43                                           
+    44         1         70.0     70.0      0.0      menciones = Counter()
+    45         1         72.0     72.0      0.0      patron = re.compile(r'"mentionedUsers":\s*\[\s*{')
+    46                                           
+    47         2       2515.0   1257.5      0.0      with open(file_path, "r", encoding="utf-8") as file:
+    48    117408    8011128.0     68.2     31.5          for linea in file:
+    49    117407    2243839.0     19.1      8.8              if not patron.search(linea):
+    50     73389     134202.0      1.8      0.5                  continue  # descarta líneas sin usuarios mencionados
+    51                                           
+    52     44018      87120.0      2.0      0.3              try:
+    53     44018   12885148.0    292.7     50.7                  tweet = cargar_json(linea)
+    54    147421     575462.0      3.9      2.3                  for usuarios_mencionados in tweet.get("mentionedUsers") or []:
+    55    103403     346685.0      3.4      1.4                      usuario = usuarios_mencionados.get("username")
+    56    103403     212242.0      2.1      0.8                      if usuario:
+    57    103403     818724.0      7.9      3.2                          menciones[usuario] += 1
+    58                                           
+    59                                                       except JSONDecodeError:
+    60                                                           continue
+    61                                           
+    62         1      77385.0  77385.0      0.3      return menciones.most_common(10)

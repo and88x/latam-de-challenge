@@ -1,0 +1,58 @@
+Accordion(children=(Output(),), titles=('',))
+Filename: C:\Users\and88\OneDrive\Documents\Python\latam_challenge_DE\src\q2_memory.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     7    491.2 MiB    491.2 MiB           1   def q2_memory(file_path: str) -> List[Tuple[str, int]]:
+     8                                             """
+     9                                             Procesa un archivo de tweets en formato JSON línea por línea, devolviendo los 10 emojis más utilizados
+    10                                             junto con su cantidad de ocurrencias.
+    11                                         
+    12                                             Este método está optimizado para un bajo uso de memoria, ya que no carga todo el archivo en
+    13                                             memoria, sino que procesa cada tweet individualmente y realiza conteo_de_emojiss incrementales de emojis
+    14                                             directamente sobre el texto, sin almacenar datos intermedios.
+    15                                         
+    16                                             Args:
+    17                                                 file_path (str): Ruta al archivo de tweets en formato JSON (una línea por cada tweet).
+    18                                         
+    19                                             Returns:
+    20                                                 List[Tuple[str, int]]:
+    21                                                     Una lista ordenada (descendente) con los 10 emojis más frecuentes y su cantidad de apariciones.
+    22                                                     Cada elemento es una tupla que contiene:
+    23                                                         - str: Emoji.
+    24                                                         - int: Número total de veces que el emoji aparece en los tweets.
+    25                                         
+    26                                                     Ejemplo:
+    27                                                     [
+    28                                                         ("✈️", 6856),
+    29                                                         ("❤️", 5876),
+    30                                                         ...
+    31                                                     ]
+    32                                         
+    33                                             Notas y supuestos:
+    34                                                 - Se asume que cada línea del archivo es un JSON válido.
+    35                                                 - El texto a procesar se encuentra en el campo "content" de cada tweet.
+    36                                                 - Los emojis son identificados carácter por carácter utilizando la función emoji.is_emoji().
+    37                                                 - Tweets sin campo "content" o vacíos se ignoran.
+    38                                             """
+    39                                         
+    40    491.2 MiB      0.0 MiB           1       conteo_de_emojis = {}
+    41                                         
+    42    491.2 MiB      0.0 MiB           2       with open(file_path, "r", encoding="utf-8") as file:
+    43    491.2 MiB      0.1 MiB      117408           for linea in file:
+    44    491.2 MiB      0.0 MiB      117407               try:
+    45    491.2 MiB      0.0 MiB      117407                   tweet = cargar_json(linea)
+    46    491.2 MiB      0.0 MiB      117407                   contenido_del_tweet = tweet.get("content", "")
+    47                                         
+    48    491.2 MiB      0.0 MiB    17151490                   for caracter in contenido_del_tweet:
+    49    491.2 MiB      0.0 MiB    17034083                       if is_emoji(caracter):
+    50    491.2 MiB      0.0 MiB       45636                           conteo_de_emojis[caracter] = (
+    51    491.2 MiB      0.0 MiB       45636                               conteo_de_emojis.get(caracter, 0) + 1
+    52                                                                 )
+    53                                         
+    54                                                     except JSONDecodeError:
+    55                                                         continue
+    56                                         
+    57                                             # Obtener el top 10 de emojis más usados
+    58    491.2 MiB      0.0 MiB        1283       top_10 = sorted(conteo_de_emojis.items(), key=lambda x: x[1], reverse=True)[:10]
+    59    491.2 MiB      0.0 MiB           1       return top_10
