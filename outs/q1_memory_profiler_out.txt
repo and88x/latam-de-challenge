@@ -1,0 +1,82 @@
+Accordion(children=(Output(),), titles=('',))
+Filename: C:\Users\and88\OneDrive\Documents\Python\latam_challenge_DE\src\q1_memory.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     9    497.0 MiB    497.0 MiB           1   def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
+    10                                             """
+    11                                             Procesa un archivo de tweets en formato JSON línea por línea, devolviendo las 10 fechas con más
+    12                                             tweets, junto con el nombre de usuario (username) más activo para cada una de esas fechas.
+    13                                         
+    14                                             Este método está optimizado para un bajo uso de memoria, utilizando un min-heap para mantener
+    15                                             únicamente las 10 fechas con mayor cantidad de tweets, en lugar de guardar todos los conteos.
+    16                                             Esto permite reducir significativamente el consumo de memoria en comparación con estrategias
+    17                                             tradicionales que almacenan el conteo completo de fechas en estructuras grandes.
+    18                                         
+    19                                             Args:
+    20                                                 file_path (str): Ruta al archivo de tweets en formato JSON (una línea por cada tweet).
+    21                                         
+    22                                             Returns:
+    23                                                 List[Tuple[datetime.date, str]]:
+    24                                                     Una lista ordenada (descendente) con las 10 fechas con más tweets.
+    25                                                     Cada elemento es una tupla que contiene:
+    26                                                         - datetime.date: La fecha específica.
+    27                                                         - str: Nombre de usuario con más tweets ese día.
+    28                                         
+    29                                                     Ejemplo:
+    30                                                     [
+    31                                                         (datetime.date(2021, 2, 24), "LATAM321"),
+    32                                                         (datetime.date(2021, 2, 23), "otroUsuario"),
+    33                                                         ...
+    34                                                     ]
+    35                                         
+    36                                             Notas y supuestos:
+    37                                                 - Se asume que cada línea del archivo es un JSON válido.
+    38                                                 - La fecha debe estar en el campo "date" con formato ISO 8601 (ej: "2021-02-24T09:23:35+00:00").
+    39                                                 - El username se encuentra en el campo "user.username".
+    40                                                 - Tweets sin fecha o usuario válido se ignoran.
+    41                                                 - El heap mantiene como máximo 10 fechas, descartando automáticamente las menos frecuentes.
+    42                                             """
+    43                                         
+    44    497.0 MiB      0.0 MiB           1       tweets_por_fecha = defaultdict(int)
+    45    497.0 MiB      0.0 MiB          27       tweets_usuario_fecha = defaultdict(lambda: defaultdict(int))
+    46                                         
+    47    497.1 MiB      0.0 MiB           2       with open(file_path, "r", encoding="utf-8") as file:
+    48    497.1 MiB      0.0 MiB      117408           for linea in file:
+    49    497.1 MiB      0.0 MiB      117407               try:
+    50    497.1 MiB      0.1 MiB      117407                   tweet = cargar_json(linea)
+    51                                         
+    52                                                         # Extraer usuario y fecha ("YYYY-MM-DD", 10 dígitos)
+    53    497.1 MiB      0.0 MiB      117407                   fecha = tweet.get("date", "")[:10]
+    54    497.1 MiB      0.0 MiB      117407                   usuario = tweet.get("user", {}).get("username", None)
+    55                                         
+    56                                                         # Se ignoran los registros incompletos
+    57    497.1 MiB      0.0 MiB      117407                   if not fecha or not usuario:
+    58                                                             continue
+    59                                         
+    60                                                         # Actualizar contadores
+    61    497.1 MiB      0.0 MiB      117407                   tweets_por_fecha[fecha] += 1
+    62    497.1 MiB      0.0 MiB      117407                   tweets_usuario_fecha[fecha][usuario] += 1
+    63                                         
+    64                                                     except JSONDecodeError:
+    65                                                         continue
+    66                                         
+    67                                             # Usar heap para mantener solo las 10 fechas con más tweets
+    68    497.1 MiB      0.0 MiB           1       heap = []
+    69    497.1 MiB      0.0 MiB          14       for fecha, count in tweets_por_fecha.items():
+    70    497.1 MiB      0.0 MiB          13           heapq.heappush(heap, (count, fecha))
+    71    497.1 MiB      0.0 MiB          13           if len(heap) > 10:
+    72    497.1 MiB      0.0 MiB           3               heapq.heappop(heap)  # elimina la fecha con menos tweets
+    73                                         
+    74                                             # Ordenar fechas de más a menos tweets
+    75    497.1 MiB      0.0 MiB           1       top_fechas = sorted(heap, reverse=True)
+    76                                         
+    77                                             # Usuario más activo de cada fecha
+    78    497.1 MiB      0.0 MiB           1       resultado = []
+    79    497.1 MiB      0.0 MiB          11       for _, fecha in top_fechas:
+    80    497.1 MiB      0.0 MiB          10           usuarios = tweets_usuario_fecha[fecha]
+    81    497.1 MiB      0.0 MiB       88328           usuario_mas_activo = max(usuarios.items(), key=lambda x: x[1])[0]
+    82    497.1 MiB      0.0 MiB          10           fecha = datetime.datetime.strptime(fecha, "%Y-%m-%d").date()
+    83    497.1 MiB      0.0 MiB          10           resultado.append((fecha, usuario_mas_activo))
+    84                                         
+    85    497.1 MiB      0.0 MiB           1       return resultado

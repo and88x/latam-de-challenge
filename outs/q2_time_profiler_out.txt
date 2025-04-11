@@ -1,0 +1,62 @@
+Accordion(children=(Output(),), titles=('',))
+Timer unit: 1e-07 s
+
+Total time: 11.7965 s
+File: C:\Users\and88\OneDrive\Documents\Python\latam_challenge_DE\src\q2_time.py
+Function: q2_time at line 7
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     7                                           def q2_time(file_path: str) -> List[Tuple[str, int]]:
+     8                                               """
+     9                                               Procesa un archivo de tweets en formato JSON cargándolo completamente en memoria,
+    10                                               y devuelve los 10 emojis más utilizados junto con su cantidad de ocurrencias.
+    11                                           
+    12                                               Este método está optimizado para velocidad de ejecución, ya que evita la lectura
+    13                                               línea por línea (I/O secuencial) y utiliza estructuras eficientes como `set` para
+    14                                               búsquedas rápidas y `Counter` para acumulación directa.
+    15                                           
+    16                                               Args:
+    17                                                   file_path (str): Ruta al archivo de tweets en formato JSON (una línea por cada tweet).
+    18                                           
+    19                                               Returns:
+    20                                                   List[Tuple[str, int]]:
+    21                                                       Una lista ordenada (descendente) con los 10 emojis más frecuentes y su cantidad de apariciones.
+    22                                                       Cada elemento es una tupla que contiene:
+    23                                                           - str: Emoji.
+    24                                                           - int: Número total de veces que el emoji aparece en los tweets.
+    25                                           
+    26                                                       Ejemplo:
+    27                                                       [
+    28                                                           ("✈️", 6856),
+    29                                                           ("❤️", 5876),
+    30                                                           ...
+    31                                                       ]
+    32                                           
+    33                                               Notas y supuestos:
+    34                                                   - Se asume que cada línea del archivo es un JSON válido codificado en UTF-8.
+    35                                                   - El campo de texto a procesar se encuentra en "content".
+    36                                                   - La detección de emojis se realiza carácter por carácter, comparando con un conjunto (`set`)
+    37                                                     construido a partir de `emoji.EMOJI_DATA.keys()`, que contiene todos los emojis reconocidos.
+    38                                                   - Tweets sin campo "content" o vacíos se ignoran.
+    39                                               """
+    40                                           
+    41         1       3368.0   3368.0      0.0      emoji_set = set(EMOJI_DATA.keys())
+    42         1         96.0     96.0      0.0      conteo_de_emojis = Counter()
+    43                                           
+    44         2       1976.0    988.0      0.0      with open(file_path, "r", encoding="utf-8") as f:
+    45         1    8383245.0    8e+06      7.1          lineas = f.readlines()
+    46                                           
+    47    117408     648368.0      5.5      0.5      for linea in lineas:
+    48    117407     232378.0      2.0      0.2          try:
+    49    117407   30767690.0    262.1     26.1              tweet = cargar_json(linea)
+    50    117407     533230.0      4.5      0.5              contenido_del_tweet = tweet.get("content", "")
+    51                                           
+    52  17151490   36540070.0      2.1     31.0              for caracter in contenido_del_tweet:
+    53  17034083   40455557.0      2.4     34.3                  if caracter in emoji_set:
+    54     45636     395403.0      8.7      0.3                      conteo_de_emojis[caracter] += 1
+    55                                           
+    56                                                   except JSONDecodeError:
+    57                                                       continue
+    58                                           
+    59         1       3378.0   3378.0      0.0      return conteo_de_emojis.most_common(10)

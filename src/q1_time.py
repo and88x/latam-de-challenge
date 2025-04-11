@@ -1,7 +1,7 @@
 import datetime
 
 from typing import List, Tuple
-from json import loads as cargar_json
+from json import loads as cargar_json, JSONDecodeError
 from collections import Counter, defaultdict
 
 
@@ -63,7 +63,7 @@ def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
             tweets_por_fecha[fecha] += 1
             tweets_usuario_fecha[fecha][usuario] += 1
 
-        except orjson.JSONDecodeError:
+        except JSONDecodeError:
             continue
 
     # Obtener top 10 fechas en orden descendente
